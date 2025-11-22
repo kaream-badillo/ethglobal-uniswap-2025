@@ -1,6 +1,8 @@
 # 🪝 Anti-Sandwich Hook for Uniswap v4 (Stable Assets)
 
-> **A Uniswap v4 Hook that detects sandwich attack patterns in stable asset markets and dynamically adjusts fees based on risk score, protecting LPs and users without blocking swaps.**
+> **This hook NEVER blocks swaps — it only adjusts fees.**
+
+A Uniswap v4 Hook that detects sandwich attack patterns in stable asset markets and dynamically adjusts fees based on risk score, protecting LPs and users without blocking swaps.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Solidity](https://img.shields.io/badge/Solidity-^0.8.0-blue.svg)](https://soliditylang.org/)
@@ -14,6 +16,7 @@ Users and Liquidity Providers (LPs) in stable asset markets suffer from **Sandwi
 - Bots detect pending large swaps
 - Execute swaps before (front-run) and after (back-run) the victim's swap
 - Users pay more and LPs lose due to exploited arbitrage
+- **Sandwich attacks extract value directly from LPs by forcing unfavorable rebalancing at narrow spreads.**
 - This is especially problematic in stable pairs (USDC/USDT, DAI/USDC, etc.)
 
 ## 💡 Solution
@@ -29,6 +32,13 @@ This Uniswap v4 Hook:
 
 ## 🏗️ How It Works
 
+### Algorithm Overview (4 Steps)
+
+1. **Detect** → Hook intercepts swap before execution
+2. **Calculate** → Compute risk score from trade size, price delta, and spike patterns
+3. **Adjust** → Apply dynamic fee based on risk (5 bps → 60 bps)
+4. **Update** → Record metrics after swap for future detection
+
 ### Risk Score Calculation
 
 The hook tracks multiple metrics and calculates a risk score:
@@ -39,6 +49,8 @@ riskScore =
     30 * deltaPrice +             // Price movement
     20 * recentSpikeCount;        // Consecutive large trades
 ```
+
+**Note:** These weights are heuristic and can be calibrated per poolKey. For the hackathon, we use a simple version optimized for clarity.
 
 Where:
 - `relativeSize = tradeSize / avgTradeSize` (if > 5x → high risk)
@@ -137,7 +149,7 @@ The hook can be configured with the following parameters:
 - **`highRiskFee`**: Fee for high risk (default: 60 bps = 0.60%)
 - **`riskThresholdLow`**: Low risk threshold (default: 50)
 - **`riskThresholdHigh`**: High risk threshold (default: 150)
-- **Risk score weights**: `w1 = 50`, `w2 = 30`, `w3 = 20` (adjustable constants)
+- **Risk score weights**: `w1 = 50`, `w2 = 30`, `w3 = 20` (heuristic weights, can be calibrated per poolKey. For the hackathon, we use a simple version optimized for clarity)
 
 ### Setting Parameters
 

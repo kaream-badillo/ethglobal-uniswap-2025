@@ -313,7 +313,7 @@ contract AntiSandwichHook is BaseHook {
     }
 
     /// @notice Calculates the dynamic fee based on risk score
-    /// @dev To be implemented in Paso 1.3
+    /// @dev Implemented in Paso 1.3
     /// @dev Fee tiers from docs-internos/idea-general.md:
     ///      - Low risk (< 50): 5 bps
     ///      - Medium risk (50-150): 20 bps
@@ -332,19 +332,59 @@ contract AntiSandwichHook is BaseHook {
         PoolId poolId,
         uint8 riskScore
     ) internal view returns (uint24 fee) {
-        // TODO: Implement in Paso 1.3
-        // 1. Read poolStorage[poolId] to get thresholds and fees
-        // 2. Check if configuration exists (lowRiskFee != 0)
-        // 3. Apply fee logic:
-        //    if (riskScore < riskThresholdLow) {
-        //        fee = lowRiskFee != 0 ? lowRiskFee : 5; // Default 5 bps
-        //    } else if (riskScore < riskThresholdHigh) {
-        //        fee = mediumRiskFee != 0 ? mediumRiskFee : 20; // Default 20 bps
-        //    } else {
-        //        fee = highRiskFee != 0 ? highRiskFee : 60; // Default 60 bps
-        //    }
-        // 4. Return fee
-        return 0;
+        PoolStorage storage storage_ = poolStorage[poolId];
+        
+        // ============================================================
+        // Read thresholds and fees from storage
+        // ============================================================
+        uint8 riskThresholdLow = storage_.riskThresholdLow;
+        uint8 riskThresholdHigh = storage_.riskThresholdHigh;
+        uint24 lowRiskFee = storage_.lowRiskFee;
+        uint24 mediumRiskFee = storage_.mediumRiskFee;
+        uint24 highRiskFee = storage_.highRiskFee;
+        
+        // ============================================================
+        // Validate configuration and use defaults if not configured
+        // ============================================================
+        // If thresholds are not configured (0), use default values
+        if (riskThresholdLow == 0) {
+            riskThresholdLow = 50; // Default low threshold
+        }
+        if (riskThresholdHigh == 0) {
+            riskThresholdHigh = 150; // Default high threshold
+        }
+        
+        // If fees are not configured (0), use default values
+        if (lowRiskFee == 0) {
+            lowRiskFee = 5; // Default: 5 bps (0.05%)
+        }
+        if (mediumRiskFee == 0) {
+            mediumRiskFee = 20; // Default: 20 bps (0.20%)
+        }
+        if (highRiskFee == 0) {
+            highRiskFee = 60; // Default: 60 bps (0.60%) - anti-sandwich mode
+        }
+        
+        // ============================================================
+        // Apply dynamic fee logic based on risk score
+        // ============================================================
+        // Low risk: riskScore < riskThresholdLow (default: < 50)
+        // - Normal trading conditions, minimal fee
+        if (riskScore < riskThresholdLow) {
+            fee = lowRiskFee;
+        }
+        // Medium risk: riskThresholdLow <= riskScore < riskThresholdHigh (default: 50-150)
+        // - Moderate suspicious activity, increased fee
+        else if (riskScore < riskThresholdHigh) {
+            fee = mediumRiskFee;
+        }
+        // High risk: riskScore >= riskThresholdHigh (default: >= 150)
+        // - High probability of sandwich attack, maximum fee (anti-sandwich mode)
+        else {
+            fee = highRiskFee;
+        }
+        
+        return fee;
     }
 
     // ============================================================

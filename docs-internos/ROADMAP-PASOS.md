@@ -259,7 +259,7 @@ NO implementar beforeSwap todavía, solo la función interna.
 
 ## Paso 1.3: Implementar cálculo de fee dinámica basada en riskScore
 
-**Estado:** ⚪
+**Estado:** ✅ **COMPLETADO**
 
 ### ¿Qué hacer?
 
@@ -294,6 +294,24 @@ Requisitos:
 - Validar que thresholds y fees estén configurados correctamente
 - Referencia a docs-internos/idea-general.md sección "Ajuste de fee dinámico"
 ```
+
+### Verificación
+
+✅ **Implementación completada:**
+- Función `_calculateDynamicFee()` implementada en `src/AntiSandwichHook.sol`
+- Lectura de thresholds y fees del storage (`poolStorage[poolId]`)
+- Lógica de 3 niveles implementada:
+  - **Low risk** (`riskScore < riskThresholdLow`): `lowRiskFee` (default: 5 bps)
+  - **Medium risk** (`riskThresholdLow <= riskScore < riskThresholdHigh`): `mediumRiskFee` (default: 20 bps)
+  - **High risk** (`riskScore >= riskThresholdHigh`): `highRiskFee` (default: 60 bps - anti-sandwich mode)
+- Valores por defecto aplicados si la configuración no existe:
+  - `riskThresholdLow = 50` (si no configurado)
+  - `riskThresholdHigh = 150` (si no configurado)
+  - `lowRiskFee = 5 bps` (si no configurado)
+  - `mediumRiskFee = 20 bps` (si no configurado)
+  - `highRiskFee = 60 bps` (si no configurado)
+- Comentarios explicativos incluidos para cada nivel de riesgo
+- Sin errores de linting
 
 ### Dependencias
 
