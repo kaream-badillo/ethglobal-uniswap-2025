@@ -1,6 +1,10 @@
 # 🗺️ ROADMAP-PASOS – Desarrollo Paso a Paso
 
-> **Guía completa de desarrollo modular para el Hook Anti-Sandwich (Stable Assets)**
+- ⚠️ **IMPORTANTE:** Este archivo es un roadmap interno para desarrollo técnico.
+- No forma parte del README público y no será revisado por los jueces del hackathon.
+- Su propósito es organizar tareas, prompts y progreso de development.
+ 
+**Guía completa de desarrollo modular para el Hook Anti-Sandwich (Stable Assets)**
 
 Este documento contiene pasos específicos con prompts listos para copiar/pegar a la IA, organizados en fases lógicas.
 
@@ -326,7 +330,7 @@ Requisitos:
 
 ## Paso 1.4: Implementar beforeSwap hook
 
-**Estado:** ⚪
+**Estado:** ✅ **COMPLETADO**
 
 ### ¿Qué hacer?
 
@@ -354,6 +358,23 @@ Requisitos:
 
 Validar que compile sin errores.
 ```
+
+### Verificación
+
+✅ **Implementación completada:**
+- Función `_beforeSwap()` implementada en `src/AntiSandwichHook.sol`
+- Lectura de precio actual usando `poolManager.getSlot0(poolId)` ✅
+- Obtención de `tradeSize` desde `params.amountSpecified` (conversión de `int256` a `uint256` con `abs()`) ✅
+- Llamada a `_calculateRiskScore(poolId, sqrtPriceX96, tradeSize)` ✅
+- Llamada a `_calculateDynamicFee(poolId, riskScore)` ✅
+- Retorno correcto: `(selector, BeforeSwapDelta.ZERO_DELTA, dynamicFee)` ✅
+- Evento `DynamicFeeApplied` emitido con todas las métricas ✅
+- Manejo de edge cases:
+  - Pool no inicializado (`sqrtPriceX96 == 0`): retorna fee por defecto
+  - `tradeSize == 0`: retorna fee por defecto
+- Comentarios NatSpec completos ✅
+- Sin errores de linting ✅
+- Compila sin errores ✅
 
 ### Dependencias
 

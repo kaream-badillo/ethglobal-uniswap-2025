@@ -121,38 +121,88 @@ contract AntiSandwichHook is BaseHook {
     // ============================================================
 
     /// @notice Hook called before a swap
-    /// @dev Will implement risk score calculation and dynamic fee in Paso 1.4
-    /// @dev Based on Uniswap v4 template and best practices from README-INTERNO.md
+    /// @dev Implemented in Paso 1.4
+    /// @dev Calculates risk score and applies dynamic fee based on detected sandwich patterns
     /// @param sender The address initiating the swap
     /// @param key The pool key
-    /// @param params Swap parameters including amountIn/amountOut
+    /// @param params Swap parameters including amountSpecified
     /// @param hookData Additional hook data (unused for now)
     /// @return selector The function selector
-    /// @return delta The swap delta (zero for now)
-    /// @return fee The dynamic fee to apply (to be calculated)
-    /// 
-    /// @notice Implementation notes (Paso 1.4):
-    /// - Get current price: (uint160 sqrtPriceX96,,,) = poolManager.getSlot0(key.toId())
-    /// - Get tradeSize: params.amountSpecified (int256, convert to uint256 with abs)
-    /// - Calculate riskScore using _calculateRiskScore()
-    /// - Calculate dynamicFee using _calculateDynamicFee()
-    /// - Return fee to override pool's base fee
+    /// @return delta The swap delta (always zero - we don't modify swap amounts)
+    /// @return fee The dynamic fee to apply (calculated based on risk score)
     function _beforeSwap(
         address sender,
         PoolKey calldata key,
         SwapParams calldata params,
         bytes calldata hookData
     ) internal override returns (bytes4, BeforeSwapDelta, uint24) {
-        // TODO: Implement in Paso 1.4
-        // 1. Get current price from pool using poolManager.getSlot0(key.toId())
-        //    Example: (uint160 sqrtPriceX96,,,) = poolManager.getSlot0(key.toId());
-        // 2. Get tradeSize from params.amountSpecified (int256, use abs() to convert to uint256)
-        // 3. Call _calculateRiskScore(poolId, currentPrice, tradeSize) (to be implemented in Paso 1.2)
-        // 4. Call _calculateDynamicFee(poolId, riskScore) (to be implemented in Paso 1.3)
-        // 5. Return (selector, BeforeSwapDelta.ZERO_DELTA, dynamicFee)
-        // 6. Emit DynamicFeeApplied event with all metrics
+        PoolId poolId = key.toId();
         
-        return (BaseHook.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
+        // ============================================================
+        // 1. Get current price from pool (sqrtPriceX96)
+        // ============================================================
+        (uint160 sqrtPriceX96,,,) = poolManager.getSlot0(poolId);
+        
+        // Edge case: If pool is not initialized (sqrtPriceX96 == 0), use default fee
+        if (sqrtPriceX96 == 0) {
+            return (BaseHook.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
+        }
+        
+        // ============================================================
+        // 2. Get tradeSize from params.amountSpecified
+        // ============================================================
+        // amountSpecified is int256 (can be positive or negative depending on swap direction)
+        // We need the absolute value to get the trade size
+        uint256 tradeSize;
+        if (params.amountSpecified < 0) {
+            tradeSize = uint256(-params.amountSpecified);
+        } else {
+            tradeSize = uint256(params.amountSpecified);
+        }
+        
+        // Edge case: If tradeSize is 0, use default fee
+        if (tradeSize == 0) {
+            return (BaseHook.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
+        }
+        
+        // ============================================================
+        // 3. Calculate risk score based on current metrics
+        // ============================================================
+        uint8 riskScore = _calculateRiskScore(poolId, sqrtPriceX96, tradeSize);
+        
+        // ============================================================
+        // 4. Calculate dynamic fee based on risk score
+        // ============================================================
+        uint24 dynamicFee = _calculateDynamicFee(poolId, riskScore);
+        
+        // ============================================================
+        // 5. Get metrics for event emission
+        // ============================================================
+        PoolStorage storage storage_ = poolStorage[poolId];
+        uint256 avgTradeSize = storage_.avgTradeSize;
+        uint256 relativeSize = (avgTradeSize > 0) ? (tradeSize * 100) / avgTradeSize : 0;
+        uint160 lastPrice = storage_.lastPrice;
+        uint160 deltaPrice = (lastPrice > 0 && sqrtPriceX96 > lastPrice) 
+            ? sqrtPriceX96 - lastPrice 
+            : (lastPrice > sqrtPriceX96) ? lastPrice - sqrtPriceX96 : 0;
+        uint8 recentSpikeCount = storage_.recentSpikeCount;
+        
+        // ============================================================
+        // 6. Emit event for logging and monitoring
+        // ============================================================
+        emit DynamicFeeApplied(
+            poolId,
+            riskScore,
+            dynamicFee,
+            relativeSize,
+            deltaPrice,
+            recentSpikeCount
+        );
+        
+        // ============================================================
+        // 7. Return hook response with dynamic fee
+        // ============================================================
+        return (BaseHook.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, dynamicFee);
     }
 
     /// @notice Hook called after a swap
