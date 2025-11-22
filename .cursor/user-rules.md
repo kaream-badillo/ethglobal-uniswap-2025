@@ -1,8 +1,8 @@
-# 🎯 User Rules - Hook Anti-LVR
+# 🎯 User Rules - Hook Anti-Sandwich para Stable Assets
 
 ## 🧭 Propósito
 
-Definir cómo debe responder la IA (Cursor) cuando el usuario interactúa en el contexto del proyecto **Hook Anti-LVR**. Reglas de tono, estilo, enfoque y prioridades para asegurar consistencia en hackathons y desarrollo real.
+Definir cómo debe responder la IA (Cursor) cuando el usuario interactúa en el contexto del proyecto **Hook Anti-Sandwich para Stable Assets**. Reglas de tono, estilo, enfoque y prioridades para asegurar consistencia en hackathons y desarrollo real.
 
 ---
 
@@ -29,7 +29,7 @@ Definir cómo debe responder la IA (Cursor) cuando el usuario interactúa en el 
 
 ## 🚦 Prioridades de Entrega
 
-1. **MVP funcional en testnet**: hook deployado → validar acción → mintear/swap → ver en explorer.
+1. **MVP funcional en testnet**: hook deployado → validar acción → swap con/sin hook → ver en explorer.
 2. **Demo ejecutable y README claro**.
 3. **Pitch público** (video 3 min EN con subtítulos).
 4. **Iteraciones opcionales** (governance, métricas avanzadas, optimizaciones).
@@ -48,11 +48,11 @@ Definir cómo debe responder la IA (Cursor) cuando el usuario interactúa en el 
 
 ### Solidity
 
-- **Nombres descriptivos:** `calculateAmortizedPrice()` no `calcPrice()`
+- **Nombres descriptivos:** `calculateRiskScore()` no `calcRisk()`
 - **Comentarios NatSpec:** Todas las funciones públicas
 - **Events:** Para cambios importantes de estado
 - **Modifiers:** Para validaciones reutilizables
-- **Storage packing:** Optimizar structs cuando sea posible
+- **Storage packing:** Optimizar structs cuando sea posible (uint8, uint160, etc.)
 
 ### Testing
 
@@ -60,6 +60,7 @@ Definir cómo debe responder la IA (Cursor) cuando el usuario interactúa en el 
 - **Fork tests:** Usar `--fork-url` para tests de integración
 - **Coverage:** Objetivo >80%
 - **Fuzzing:** Donde sea apropiado
+- **Tests de patrones:** Incluir tests específicos para detectar sandwich attacks
 
 ### Deployment
 
@@ -94,7 +95,8 @@ forge test
 forge test --fork-url $RPC_URL
 
 # Tests específicos
-forge test --match-test test_CalculateAmortizedPrice
+forge test --match-test test_CalculateRiskScore
+forge test --match-test test_SandwichPatternDetection
 
 # Coverage
 forge coverage
@@ -104,7 +106,7 @@ forge coverage
 
 ```bash
 # Deploy a testnet
-forge script script/deploy/DeployAntiLVRHook.s.sol \
+forge script script/deploy/DeployAntiSandwichHook.s.sol \
   --rpc-url $RPC_URL \
   --account $ACCOUNT \
   --sender $SENDER \
@@ -117,7 +119,7 @@ forge verify-contract \
   --verifier etherscan \
   --etherscan-api-key $ETHERSCAN_API_KEY \
   $CONTRACT_ADDRESS \
-  src/AntiLVRHook.sol:AntiLVRHook
+  src/AntiSandwichHook.sol:AntiSandwichHook
 ```
 
 ### Desarrollo Local
@@ -130,7 +132,7 @@ anvil
 anvil --fork-url $RPC_URL
 
 # Ejecutar scripts localmente
-forge script script/deploy/DeployAntiLVRHook.s.sol \
+forge script script/deploy/DeployAntiSandwichHook.s.sol \
   --rpc-url http://localhost:8545 \
   --private-key $PRIVATE_KEY \
   --broadcast
@@ -142,19 +144,20 @@ forge script script/deploy/DeployAntiLVRHook.s.sol \
 
 ### Contratos
 
-- `src/AntiLVRHook.sol` - Hook principal
+- `src/AntiSandwichHook.sol` - Hook principal (renombrar de AntiLVRHook)
 - `src/interfaces/` - Interfaces de Uniswap v4
 - `src/libraries/` - Librerías auxiliares (si aplica)
 
 ### Tests
 
-- `test/AntiLVRHook.t.sol` - Tests unitarios
+- `test/AntiSandwichHook.t.sol` - Tests unitarios
 - `test/integration/` - Tests de integración
 - `test/utils/` - Helpers para tests
+- `test/sandwich/` - Tests específicos de detección de sandwich
 
 ### Scripts
 
-- `script/deploy/DeployAntiLVRHook.s.sol` - Script de deployment
+- `script/deploy/DeployAntiSandwichHook.s.sol` - Script de deployment
 - `script/utils/` - Utilidades para scripts
 
 ---
@@ -164,8 +167,8 @@ forge script script/deploy/DeployAntiLVRHook.s.sol \
 ### Archivos Clave
 
 - `.cursor/project-context.md` - Contexto completo del proyecto
-- `docs-internos/idea-general.md` - Lógica del hook
-- `docs-internos/hackathon-ethglobal-uniswap.md` - Info del hackathon
+- `docs-internos/idea-general.md` - Lógica del hook (NUEVA IDEA - Anti-Sandwich)
+- `docs-internos/hackathon-ethglobal-uniswap.md` - Info del hackathon (Track 1)
 - `docs-internos/ROADMAP-PASOS.md` - Guía paso a paso
 - `README.md` - Documentación pública
 
@@ -183,6 +186,7 @@ Antes de considerar una tarea completa:
 
 - [ ] Código compila sin errores
 - [ ] Tests pasan (`forge test`)
+- [ ] Tests de detección de sandwich pasan
 - [ ] Comentarios NatSpec en funciones públicas
 - [ ] No hay datos sensibles hardcodeados
 - [ ] README actualizado (si aplica)
@@ -193,10 +197,11 @@ Antes de considerar una tarea completa:
 ## 🚨 Errores Comunes a Evitar
 
 1. **Hardcodear private keys** - Usar keystore o .env
-2. **Olvidar actualizar lastPrice** - Crítico en afterSwap()
+2. **Olvidar actualizar métricas** - Crítico en afterSwap() (lastPrice, avgTradeSize, recentSpikeCount)
 3. **No validar parámetros** - Siempre validar inputs
-4. **Tests incompletos** - Cubrir edge cases
+4. **Tests incompletos** - Cubrir edge cases y patrones de sandwich
 5. **Documentación desactualizada** - Mantener README sincronizado
+6. **Overflow/Underflow** - Validar cálculos de riskScore y avgTradeSize
 
 ---
 
@@ -204,12 +209,31 @@ Antes de considerar una tarea completa:
 
 1. **Usar el template oficial** - Base sólida de Uniswap v4
 2. **Tests primero** - TDD ayuda a validar lógica
-3. **Fork tests** - Validar con pools reales
+3. **Fork tests** - Validar con pools reales de stable assets
 4. **Gas optimization después** - MVP primero, optimizar después
 5. **Documentar mientras desarrollas** - No dejar para el final
+6. **Enfocarse en Track 1** - Stable assets, no volatile pairs
+
+---
+
+## 🎯 Enfoque para Track 1
+
+### Alineación con Track 1
+
+El hook debe demostrar:
+- **Lógica AMM optimizada para stables** ✅ (fee dinámica anti-sandwich)
+- **Trading respaldado por crédito** (indirecto - protege traders)
+- **Lending sintético** (futuro - puede extenderse)
+
+### Pitch Points Clave
+
+- "Detecta patrones de riesgo típicos de sandwich en mercados estables"
+- "Calcula un score de riesgo y ajusta la fee dinámicamente"
+- "Protege LPs y reduce MEV sin bloquear swaps ni romper UX"
+- "Sin oráculos, simple, elegante y explicable"
 
 ---
 
 📅 **Última edición:** 2025-11-22  
 👤 **Creado por:** kaream  
-🎯 **Versión:** 1.0
+🎯 **Versión:** 2.0 (Track 1 - Stable Assets)

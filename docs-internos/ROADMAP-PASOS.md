@@ -1,20 +1,20 @@
 # 🗺️ ROADMAP-PASOS – Desarrollo Paso a Paso
 
-> **Guía completa de desarrollo modular para el Hook Anti-LVR**
+> **Guía completa de desarrollo modular para el Hook Anti-Sandwich (Stable Assets)**
 
 Este documento contiene pasos específicos con prompts listos para copiar/pegar a la IA, organizados en fases lógicas.
 
 **Contexto del Hackathon:**
 - **Evento:** ETHGlobal Buenos Aires (Nov 2025)
-- **Track:** Track 2 - Uniswap v4 Volatile-Pairs Hooks ($10,000 prize pool)
+- **Track:** Track 1 - Uniswap v4 Stable-Asset Hooks ($10,000 prize pool)
 - **Organizador:** Uniswap Foundation
 - **Requisitos de entrega:** TxIDs, GitHub repo, README, demo/instrucciones, video (máx. 3 min)
 
 **Referencias:**
-- `cursor/project-context.md` - Contexto técnico completo
-- `cursor/user-rules.md` - Reglas para el asistente AI
+- `.cursor/project-context.md` - Contexto técnico completo
+- `.cursor/user-rules.md` - Reglas para el asistente AI
 - `docs-internos/hackathon-ethglobal-uniswap.md` - Información del hackathon
-- `docs-internos/idea-general.md` - Idea y lógica del hook
+- `docs-internos/idea-general.md` - Idea y lógica del hook (NUEVA - Anti-Sandwich)
 - `README.md` - Documentación pública
 
 ---
@@ -49,32 +49,32 @@ Este documento contiene pasos específicos con prompts listos para copiar/pegar 
    - `foundry.toml` configurado (Solidity 0.8.30, EVM Cancun)
    - Dependencias instaladas: Uniswap v4, hookmate, forge-std
    - `.env.example` creado
-   - `.cursor/` con project-context.md y user-rules.md
+   - `.cursor/` con project-context.md y user-rules.md actualizados
 
 3. **Fase 4.1** - README actualizado ✅ (parcial)
-   - README.md con documentación completa del MVP
+   - README.md actualizado con nueva idea Anti-Sandwich
    - ⚠️ Pendiente: agregar links a contract addresses (después del deployment)
 
 ### 🎯 Próximo Paso Crítico
 
 **Fase 1, Paso 1.1** - Crear interfaces y base del hook ⚪
-- **Acción:** Crear `src/AntiLVRHook.sol`
+- **Acción:** Renombrar/crear `src/AntiSandwichHook.sol`
 - **Basarse en:** `Counter.sol` del template como referencia
-- **Implementar:** Estructura base con storage mínimo
+- **Implementar:** Estructura base con nuevo storage (lastPrice, lastTradeSize, avgTradeSize, recentSpikeCount)
 - **Configurar:** `getHookPermissions()` para beforeSwap y afterSwap
 
 ### 📋 Pendiente (18 pasos)
 
-- **Fase 1** (6 pasos): Implementación completa del hook Anti-LVR
-- **Fase 2** (3 pasos): Testing completo (>80% coverage)
+- **Fase 1** (6 pasos): Implementación completa del hook Anti-Sandwich
+- **Fase 2** (3 pasos): Testing completo (>80% coverage, incluyendo detección de sandwich)
 - **Fase 3** (2 pasos): Deployment a testnet (CRÍTICO: guardar TxIDs)
 - **Fase 4** (3 pasos): Demo, video pitch y entregables del hackathon
 - **Fase 5** (2 pasos): Optimizaciones opcionales
 
 ### ⏱️ Prioridades para Hackathon
 
-1. **URGENTE:** Fase 1 completa (hook funcional)
-2. **URGENTE:** Fase 2 básica (tests mínimos funcionales)
+1. **URGENTE:** Fase 1 completa (hook funcional con riskScore y fee dinámica)
+2. **URGENTE:** Fase 2 básica (tests mínimos funcionales + tests de detección de sandwich)
 3. **CRÍTICO:** Fase 3.2 (deployment con TxIDs guardados)
 4. **OBLIGATORIO:** Fase 4.3 (video pitch 3 min)
 5. **OBLIGATORIO:** Fase 4.4 (checklist de entregables)
@@ -91,13 +91,6 @@ Este documento contiene pasos específicos con prompts listos para copiar/pegar 
 
 **Estado:** ✅ **COMPLETADO**
 
-### ¿Qué hacer?
-
-Crear la estructura completa de carpetas del proyecto basada en `cursor/project-context.md`, incluyendo:
-- Carpetas para contratos, tests, scripts
-- Carpetas para futuras funcionalidades (governance, oráculos opcionales, dashboard)
-- READMEs orientativos en cada carpeta
-
 ### Estado Actual
 
 ✅ **Completado** - El template oficial de Uniswap v4 ya incluye la estructura base:
@@ -106,49 +99,11 @@ Crear la estructura completa de carpetas del proyecto basada en `cursor/project-
 - `script/` - Scripts de deployment (existen scripts base)
 - `lib/` - Dependencias (Uniswap v4, hookmate, forge-std)
 
-### ¿Qué pedir a la IA?
-
-```
-Crea la estructura completa de carpetas para el proyecto Hook Anti-LVR basándote en cursor/project-context.md.
-
-Estructura requerida:
-- contracts/hooks/ (hook principal)
-- contracts/interfaces/ (interfaces Uniswap v4)
-- contracts/libraries/ (librerías auxiliares)
-- contracts/governance/ (futuro: governance para parámetros)
-- test/unit/ (tests unitarios)
-- test/integration/ (tests de integración)
-- test/fork/ (tests en fork)
-- script/deploy/ (scripts de deployment)
-- script/utils/ (utilidades)
-- docs/api/ (documentación de API futura)
-- docs/architecture/ (documentación de arquitectura)
-
-En cada carpeta, crea un README.md orientativo que explique:
-- Qué va en esta carpeta
-- Qué archivos se crearán aquí
-- Referencias a project-context.md cuando corresponda
-
-NO crear archivos de código todavía, solo estructura y READMEs.
-```
-
-### Dependencias
-
-- Ninguna (es el primer paso)
-
-### Referencias
-
-- `cursor/project-context.md` - Sección "Organización del proyecto"
-
 ---
 
 ## Paso 0.2: Configurar Foundry y dependencias
 
 **Estado:** ✅ **COMPLETADO**
-
-### ¿Qué hacer?
-
-Configurar Foundry, crear `foundry.toml`, e instalar dependencias de Uniswap v4.
 
 ### Estado Actual
 
@@ -156,43 +111,15 @@ Configurar Foundry, crear `foundry.toml`, e instalar dependencias de Uniswap v4.
 - `foundry.toml` existe y está configurado (Solidity 0.8.30, EVM Cancun)
 - Dependencias instaladas: Uniswap v4, hookmate, forge-std
 - `.env.example` creado con placeholders
-- `.cursor/` creado con project-context.md y user-rules.md
-
-### ¿Qué pedir a la IA?
-
-```
-Configura Foundry para el proyecto Hook Anti-LVR.
-
-Tareas:
-1. Crear foundry.toml con configuración para Solidity ^0.8.0
-2. Crear .gitmodules para dependencias (si aplica)
-3. Crear script de instalación de dependencias
-4. Instalar Uniswap v4 contracts usando forge install
-5. Crear .env.example con placeholders para RPC_URL, PRIVATE_KEY, etc.
-
-Referencias:
-- cursor/project-context.md - Stack de tecnologías
-- cursor/user-rules.md - Comandos frecuentes
-
-NO implementar código todavía, solo configuración.
-```
-
-### Dependencias
-
-- Paso 0.1 (estructura creada)
-
-### Referencias
-
-- `cursor/project-context.md` - Sección "Stack de tecnologías"
-- `cursor/user-rules.md` - Sección "Comandos frecuentes del proyecto"
+- `.cursor/` creado con project-context.md y user-rules.md (actualizados para Track 1)
 
 ---
 
 # FASE 1: Hook Core - Implementación Base
 
-**Objetivo:** Implementar el hook principal con lógica de precio amortiguado y fee dinámica básica.
+**Objetivo:** Implementar el hook principal con lógica de detección de riesgo y fee dinámica anti-sandwich.
 
-**Nota sobre hooks:** `idea-general.md` menciona `beforeInitialize()` y `beforeModifyPosition()`, pero para el MVP solo necesitamos `beforeSwap()` y `afterSwap()`. Los otros hooks son opcionales y pueden agregarse después si se necesita funcionalidad adicional.
+**Nota:** Solo necesitamos `beforeSwap()` y `afterSwap()` para el MVP. Los otros hooks son opcionales.
 
 ---
 
@@ -202,37 +129,34 @@ NO implementar código todavía, solo configuración.
 
 ### ¿Qué hacer?
 
-Crear las interfaces necesarias de Uniswap v4 y la estructura base del contrato `AntiLVRHook.sol` con storage mínimo.
-
-### Estado Actual
-
-⚪ **Pendiente** - Solo existe `Counter.sol` (ejemplo del template).  
-**Necesitas crear `AntiLVRHook.sol`** basado en la estructura del template pero con la lógica del hook Anti-LVR.
+Crear las interfaces necesarias de Uniswap v4 y la estructura base del contrato `AntiSandwichHook.sol` con storage mínimo para detección de sandwich.
 
 ### ¿Qué pedir a la IA?
 
 ```
-Crea el contrato base AntiLVRHook.sol basándote en cursor/project-context.md.
+Crea el contrato base AntiSandwichHook.sol basándote en cursor/project-context.md y docs-internos/idea-general.md.
 
 Requisitos:
-1. Heredar de BaseHook (o equivalente de Uniswap v4)
+1. Heredar de BaseHook (OpenZeppelin)
 2. Implementar interfaces necesarias de Uniswap v4 Hooks
-3. Definir storage mínimo:
-   - lastPrice (uint256) - último precio del pool
-   - baseFee (uint256) - fee base en basis points
-   - volatilityMultiplier (uint256) - multiplicador de volatilidad
-   - volatilityThreshold (uint256) - umbral para aplicar amortiguación
+3. Definir storage mínimo para detección de sandwich:
+   - lastPrice (uint160) - último precio del pool (sqrtPriceX96)
+   - lastTradeSize (uint256) - tamaño del swap previo
+   - avgTradeSize (uint256) - promedio dinámico simple de trade sizes
+   - recentSpikeCount (uint8) - contador de trades grandes consecutivos
+   - lowRiskFee (uint24) - fee para riesgo bajo (default: 5 bps)
+   - mediumRiskFee (uint24) - fee para riesgo medio (default: 20 bps)
+   - highRiskFee (uint24) - fee para riesgo alto (default: 60 bps)
+   - riskThresholdLow (uint8) - umbral bajo de riesgo (default: 50)
+   - riskThresholdHigh (uint8) - umbral alto de riesgo (default: 150)
 4. Crear funciones hook vacías: beforeSwap(), afterSwap()
 5. Implementar getHookPermissions() configurando solo beforeSwap y afterSwap como true
 6. Agregar comentarios NatSpec explicando cada función
 7. Seguir convenciones de cursor/user-rules.md
 
-Nota: beforeInitialize() y beforeModifyPosition() mencionados en idea-general.md son opcionales.
-Para el MVP, solo necesitamos beforeSwap() y afterSwap() que son suficientes para la funcionalidad core.
-
 Referencias:
-- cursor/project-context.md - Sección "Estructura de código esperada"
-- docs-internos/idea-general.md - Sección "Objetivo" (menciona hooks opcionales)
+- cursor/project-context.md - Sección "Storage Mínimo" y "Estructura de código esperada"
+- docs-internos/idea-general.md - Sección "Mecánica técnica exacta"
 - Uniswap v4 template oficial para hooks
 ```
 
@@ -243,39 +167,43 @@ Referencias:
 
 ### Referencias
 
-- `cursor/project-context.md` - Sección "Estructura de código esperada"
+- `.cursor/project-context.md` - Sección "Storage Mínimo"
 - `docs-internos/idea-general.md` - Lógica del hook
 
 ---
 
-## Paso 1.2: Implementar cálculo de precio amortiguado
+## Paso 1.2: Implementar cálculo de riskScore
 
 **Estado:** ⚪
 
 ### ¿Qué hacer?
 
-Implementar la función `_calculateAmortizedPrice()` que suaviza el precio usando el histórico.
+Implementar la función `_calculateRiskScore()` que calcula el score de riesgo basado en trade size, delta de precio y spikes consecutivos.
 
 ### ¿Qué pedir a la IA?
 
 ```
-Implementa la función _calculateAmortizedPrice() en AntiLVRHook.sol.
+Implementa la función _calculateRiskScore() en AntiSandwichHook.sol.
 
 Lógica requerida:
-1. Leer precio actual del pool (sqrtPriceX96)
-2. Comparar con lastPrice almacenado
-3. Calcular delta = abs(P_current - lastPrice)
-4. Si delta > volatilityThreshold:
-   - Calcular P_effective = (P_current + lastPrice) / 2
-   - Retornar P_effective
-5. Si delta <= volatilityThreshold:
-   - Retornar P_current (sin amortiguación)
+1. Calcular relativeSize = tradeSize / avgTradeSize
+   - Si avgTradeSize es 0 (primera vez), usar tradeSize como base
+2. Calcular deltaPrice = abs(P_current - lastPrice)
+3. Leer recentSpikeCount del storage
+4. Calcular riskScore usando la fórmula:
+   riskScore = (w1 * relativeSize) + (w2 * deltaPrice) + (w3 * recentSpikeCount)
+   Donde:
+   - w1 = 50 (peso del tamaño relativo)
+   - w2 = 30 (peso del delta de precio)
+   - w3 = 20 (peso de spikes consecutivos)
+5. Retornar riskScore (uint8)
 
 Requisitos:
-- Función internal pure/view según corresponda
-- Comentarios explicando la matemática
-- Manejo de edge cases (primera vez, lastPrice = 0)
-- Referencia a docs-internos/idea-general.md sección "Cómo funciona"
+- Función internal view
+- Manejar edge cases (primera vez, avgTradeSize = 0, lastPrice = 0)
+- Validar que no haya overflow en cálculos
+- Comentarios explicando la fórmula y pesos
+- Referencia a docs-internos/idea-general.md sección "Cálculo del riskScore"
 
 NO implementar beforeSwap todavía, solo la función interna.
 ```
@@ -286,51 +214,57 @@ NO implementar beforeSwap todavía, solo la función interna.
 
 ### Referencias
 
-- `docs-internos/idea-general.md` - Sección "Cómo funciona (simple)"
-- `cursor/project-context.md` - Sección "Funcionalidades por módulo"
+- `docs-internos/idea-general.md` - Sección "Cálculo del riskScore"
+- `.cursor/project-context.md` - Sección "Lógica Core"
 
 ---
 
-## Paso 1.3: Implementar cálculo de fee dinámica
+## Paso 1.3: Implementar cálculo de fee dinámica basada en riskScore
 
 **Estado:** ⚪
 
 ### ¿Qué hacer?
 
-Implementar la función `_calculateDynamicFee()` que ajusta la fee según volatilidad.
+Implementar la función `_calculateDynamicFee()` que ajusta la fee según el riskScore calculado.
 
 ### ¿Qué pedir a la IA?
 
 ```
-Implementa la función _calculateDynamicFee() en AntiLVRHook.sol.
+Implementa la función _calculateDynamicFee() en AntiSandwichHook.sol.
 
 Lógica requerida:
-1. Calcular delta = abs(P_current - lastPrice)
-2. Calcular volatilityFee = baseFee + (delta * volatilityMultiplier)
-3. Aplicar límites: minFee <= volatilityFee <= maxFee
-4. Retornar fee en basis points
-
-Parámetros:
-- baseFee: fee base (ej: 5 bps = 0.05%)
-- volatilityMultiplier: multiplicador (ajustable)
-- minFee: fee mínima (ej: 5 bps)
-- maxFee: fee máxima (ej: 50 bps)
+1. Recibir riskScore como parámetro
+2. Leer thresholds y fees del storage:
+   - riskThresholdLow
+   - riskThresholdHigh
+   - lowRiskFee
+   - mediumRiskFee
+   - highRiskFee
+3. Aplicar lógica de fee dinámica:
+   if (riskScore < riskThresholdLow) {
+       fee = lowRiskFee;        // 5 bps
+   } else if (riskScore < riskThresholdHigh) {
+       fee = mediumRiskFee;     // 20 bps
+   } else {
+       fee = highRiskFee;       // 60 bps - modo anti-sandwich
+   }
+4. Retornar fee en basis points (uint24)
 
 Requisitos:
 - Función internal view
-- Comentarios explicando la fórmula
-- Validación de parámetros
-- Referencia a docs-internos/idea-general.md sección "Fee dinámico simple"
+- Comentarios explicando la lógica de thresholds
+- Validar que thresholds y fees estén configurados correctamente
+- Referencia a docs-internos/idea-general.md sección "Ajuste de fee dinámico"
 ```
 
 ### Dependencias
 
-- Paso 1.2 (cálculo de precio implementado)
+- Paso 1.2 (cálculo de riskScore implementado)
 
 ### Referencias
 
-- `docs-internos/idea-general.md` - Sección "Fee dinámico simple (pero ganador)"
-- `cursor/project-context.md` - Sección "Funcionalidades por módulo"
+- `docs-internos/idea-general.md` - Sección "Ajuste de fee dinámico"
+- `.cursor/project-context.md` - Sección "Lógica Core"
 
 ---
 
@@ -340,26 +274,26 @@ Requisitos:
 
 ### ¿Qué hacer?
 
-Implementar la lógica completa de `beforeSwap()` que aplica precio amortiguado y fee dinámica.
+Implementar la lógica completa de `beforeSwap()` que calcula riskScore y aplica fee dinámica.
 
 ### ¿Qué pedir a la IA?
 
 ```
-Implementa la función beforeSwap() en AntiLVRHook.sol.
+Implementa la función beforeSwap() en AntiSandwichHook.sol.
 
 Lógica requerida:
-1. Leer precio actual del pool (sqrtPriceX96)
-2. Llamar _calculateAmortizedPrice() para obtener precio amortiguado
-3. Llamar _calculateDynamicFee() para obtener fee dinámica
-4. Aplicar precio amortiguado al swap (si corresponde según Uniswap v4 API)
-5. Aplicar fee dinámica al swap
-6. Retornar selector correcto (bytes4)
+1. Leer precio actual del pool (sqrtPriceX96) usando poolManager.getSlot0(poolId)
+2. Leer tradeSize del SwapParams (amountIn o amountSpecified)
+3. Llamar _calculateRiskScore() para obtener riskScore
+4. Llamar _calculateDynamicFee() para obtener fee dinámica
+5. Retornar (selector, BeforeSwapDelta, fee) según interfaz de Uniswap v4
+6. Emitir event DynamicFeeApplied (opcional pero recomendado)
 
 Requisitos:
 - Seguir interfaz oficial de Uniswap v4 Hooks
-- Manejar edge cases (primera vez, pool sin precio)
+- Manejar edge cases (primera vez, pool sin precio, tradeSize = 0)
 - Comentarios NatSpec completos
-- Events para logging (opcional pero recomendado)
+- Events para logging (DynamicFeeApplied)
 - Referencia a cursor/project-context.md sección "Guía para el asistente técnico"
 
 Validar que compile sin errores.
@@ -367,12 +301,12 @@ Validar que compile sin errores.
 
 ### Dependencias
 
-- Paso 1.2 (cálculo de precio)
+- Paso 1.2 (cálculo de riskScore)
 - Paso 1.3 (cálculo de fee)
 
 ### Referencias
 
-- `docs-internos/idea-general.md` - Sección "En beforeSwap lees"
+- `docs-internos/idea-general.md` - Sección "En beforeSwap()"
 - Uniswap v4 Hooks documentation
 
 ---
@@ -383,23 +317,35 @@ Validar que compile sin errores.
 
 ### ¿Qué hacer?
 
-Implementar `afterSwap()` que actualiza el `lastPrice` después de cada swap.
+Implementar `afterSwap()` que actualiza las métricas históricas (lastPrice, avgTradeSize, recentSpikeCount).
 
 ### ¿Qué pedir a la IA?
 
 ```
-Implementa la función afterSwap() en AntiLVRHook.sol.
+Implementa la función afterSwap() en AntiSandwichHook.sol.
 
 Lógica requerida:
 1. Leer precio actual del pool después del swap (sqrtPriceX96)
-2. Actualizar lastPrice = P_current
-3. Retornar selector correcto (bytes4)
+2. Leer tradeSize del SwapParams
+3. Actualizar lastPrice = P_current
+4. Actualizar avgTradeSize usando promedio móvil simple:
+   avgTradeSize = (avgTradeSize * 9 + tradeSize) / 10
+   (Si avgTradeSize es 0, usar tradeSize directamente)
+5. Calcular relativeSize = tradeSize / avgTradeSize
+6. Actualizar recentSpikeCount:
+   if (relativeSize > 5) {
+       recentSpikeCount++;
+   } else {
+       recentSpikeCount = 0;  // Reset si no hay spike
+   }
+7. Retornar selector correcto según interfaz
 
 Requisitos:
-- Función simple pero crítica para el funcionamiento
-- Validar que el precio sea válido antes de actualizar
+- Función crítica para el funcionamiento
+- Validar que el precio y tradeSize sean válidos antes de actualizar
+- Manejar overflow en cálculos de avgTradeSize
 - Comentarios explicando por qué actualizamos aquí
-- Referencia a docs-internos/idea-general.md sección "En afterSwap actualizas el storage"
+- Referencia a docs-internos/idea-general.md sección "En afterSwap()"
 
 Validar que compile sin errores.
 ```
@@ -410,7 +356,7 @@ Validar que compile sin errores.
 
 ### Referencias
 
-- `docs-internos/idea-general.md` - Sección "En afterSwap actualizas el storage"
+- `docs-internos/idea-general.md` - Sección "En afterSwap()"
 
 ---
 
@@ -420,28 +366,31 @@ Validar que compile sin errores.
 
 ### ¿Qué hacer?
 
-Agregar funciones para configurar parámetros del hook (baseFee, volatilityMultiplier, etc.) con control de acceso.
+Agregar funciones para configurar parámetros del hook (fees, thresholds) con control de acceso.
 
 ### ¿Qué pedir a la IA?
 
 ```
-Agrega funciones de configuración a AntiLVRHook.sol.
+Agrega funciones de configuración a AntiSandwichHook.sol.
 
 Funciones requeridas:
-1. setBaseFee(uint256 newBaseFee) - actualizar fee base
-2. setVolatilityMultiplier(uint256 newMultiplier) - actualizar multiplicador
-3. setVolatilityThreshold(uint256 newThreshold) - actualizar umbral
-4. getConfig() - view function que retorna todos los parámetros
+1. setPoolConfig(PoolKey, lowRiskFee, mediumRiskFee, highRiskFee, riskThresholdLow, riskThresholdHigh)
+   - Actualizar todos los parámetros de configuración
+2. getPoolConfig(PoolId) - view function que retorna todos los parámetros
+3. getPoolMetrics(PoolId) - view function que retorna métricas actuales (lastPrice, avgTradeSize, recentSpikeCount)
 
 Requisitos:
 - Control de acceso (onlyOwner o similar)
-- Validación de parámetros (ej: baseFee > 0, maxFee >= baseFee)
-- Events para cada cambio de configuración
-- Función de inicialización en constructor
+- Validación de parámetros:
+   - Fees deben ser > 0 y <= 10000 (100%)
+   - lowRiskFee < mediumRiskFee < highRiskFee
+   - riskThresholdLow < riskThresholdHigh
+- Events para cada cambio de configuración (PoolConfigUpdated)
+- Función de inicialización en constructor o setup inicial
 - Comentarios NatSpec
 
 Referencias:
-- cursor/project-context.md - Sección "Notas para escalabilidad futura"
+- cursor/project-context.md - Sección "Configurabilidad"
 - cursor/user-rules.md - Convenciones de código
 ```
 
@@ -451,13 +400,13 @@ Referencias:
 
 ### Referencias
 
-- `cursor/project-context.md` - Sección "Configurabilidad"
+- `.cursor/project-context.md` - Sección "Configurabilidad"
 
 ---
 
 # FASE 2: Testing Completo
 
-**Objetivo:** Crear suite completa de tests con >80% coverage.
+**Objetivo:** Crear suite completa de tests con >80% coverage, incluyendo tests específicos de detección de sandwich.
 
 ---
 
@@ -472,18 +421,19 @@ Configurar ambiente de testing y crear tests básicos para funciones internas.
 ### ¿Qué pedir a la IA?
 
 ```
-Crea tests básicos para AntiLVRHook usando Foundry.
+Crea tests básicos para AntiSandwichHook usando Foundry.
 
 Setup requerido:
-1. Crear test/AntiLVRHook.t.sol
+1. Crear test/AntiSandwichHook.t.sol
 2. Setup de fixtures (mock pool, tokens, etc.)
 3. Helper functions para crear pools y ejecutar swaps
 
 Tests iniciales:
-1. test_CalculateAmortizedPrice() - verificar cálculo de precio amortiguado
-2. test_CalculateDynamicFee() - verificar cálculo de fee dinámica
-3. test_FirstSwap() - verificar comportamiento en primer swap (lastPrice = 0)
-4. test_NoSmoothingWhenDeltaSmall() - verificar que no se amortigua si delta < threshold
+1. test_CalculateRiskScore() - verificar cálculo de riskScore con diferentes inputs
+2. test_CalculateDynamicFee() - verificar que fee se ajusta según riskScore
+3. test_FirstSwap() - verificar comportamiento en primer swap (avgTradeSize = 0)
+4. test_RelativeSizeCalculation() - verificar cálculo de relativeSize
+5. test_RecentSpikeCountUpdate() - verificar actualización de recentSpikeCount
 
 Requisitos:
 - Usar Foundry testing best practices
@@ -500,45 +450,41 @@ Ejecutar forge test para validar.
 
 ### Referencias
 
-- `cursor/user-rules.md` - Sección "Testing"
-- `cursor/project-context.md` - Sección "Resultados esperados"
+- `.cursor/user-rules.md` - Sección "Testing"
+- `.cursor/project-context.md` - Sección "Resultados esperados"
 
 ---
 
-## Paso 2.2: Tests de integración con Uniswap v4
+## Paso 2.2: Tests de detección de sandwich
 
 **Estado:** ⚪
 
 ### ¿Qué hacer?
 
-Crear tests de integración que prueben el hook con pools reales de Uniswap v4.
+Crear tests específicos que prueben la detección de patrones de sandwich attack.
 
 ### ¿Qué pedir a la IA?
 
 ```
-Crea tests de integración para AntiLVRHook con Uniswap v4.
+Crea tests de detección de sandwich para AntiSandwichHook.
 
 Tests requeridos:
-1. test_SwapWithHook() - ejecutar swap completo con hook activo
-2. test_PriceSmoothingEffect() - verificar que precio se amortigua correctamente
-3. test_DynamicFeeApplied() - verificar que fee aumenta con volatilidad
-4. test_MultipleSwaps() - verificar comportamiento en múltiples swaps consecutivos
-5. test_LVRReduction() - comparar LVR antes/después del hook (métrica clave)
+1. test_SandwichPatternDetection() - simular patrón: swap grande → pequeño → grande
+2. test_LargeTradeSizeDetection() - verificar que trade 10× mayor que promedio aumenta fee
+3. test_ConsecutiveSpikes() - verificar que múltiples spikes consecutivos aumentan riskScore
+4. test_PriceJumpDetection() - verificar que saltos bruscos de precio aumentan fee
+5. test_NormalSwapLowFee() - verificar que swaps normales mantienen fee baja (5 bps)
 
 Setup:
-- Usar fork de testnet o mainnet
-- Crear pool real con tokens
-- Ejecutar swaps y medir resultados
+- Crear pool con tokens estables (mock USDC/USDT)
+- Ejecutar secuencia de swaps simulando diferentes escenarios
+- Medir fees aplicadas y riskScores
 
 Requisitos:
-- Tests en test/integration/
-- Usar forge test --fork-url para tests en fork
-- Comentarios explicando métricas
-- Validar que LVR se reduce efectivamente
-
-Referencias:
-- cursor/project-context.md - Sección "Casos de uso principales"
-- docs-internos/idea-general.md - Sección "Por qué esta idea es brutalmente ganadora"
+- Tests en test/sandwich/ o test/integration/
+- Comentarios explicando cada patrón de sandwich
+- Validar que fee aumenta correctamente cuando se detecta riesgo
+- Referencia a docs-internos/idea-general.md sección "Patrón clásico de sandwich"
 ```
 
 ### Dependencias
@@ -547,34 +493,40 @@ Referencias:
 
 ### Referencias
 
-- `cursor/project-context.md` - Sección "Resultados esperados"
+- `docs-internos/idea-general.md` - Sección "Patrón clásico de sandwich"
+- `.cursor/project-context.md` - Sección "Casos de uso principales"
 
 ---
 
-## Paso 2.3: Tests de edge cases y seguridad
+## Paso 2.3: Tests de integración y edge cases
 
 **Estado:** ⚪
 
 ### ¿Qué hacer?
 
-Crear tests para edge cases, casos límite y posibles vulnerabilidades.
+Crear tests de integración con Uniswap v4 y tests de edge cases/seguridad.
 
 ### ¿Qué pedir a la IA?
 
 ```
-Crea tests de edge cases y seguridad para AntiLVRHook.
+Crea tests de integración y edge cases para AntiSandwichHook.
 
-Tests requeridos:
+Tests de integración:
+1. test_SwapWithHook() - ejecutar swap completo con hook activo
+2. test_MultipleSwaps() - verificar comportamiento en múltiples swaps consecutivos
+3. test_FeeAppliedCorrectly() - verificar que fee dinámica se aplica en el swap
+
+Tests de edge cases:
 1. test_ZeroPrice() - manejo de precio cero
-2. test_ExtremeVolatility() - comportamiento con cambios de precio extremos
-3. test_Reentrancy() - verificar protección contra reentrancy
-4. test_AccessControl() - verificar que solo owner puede configurar
-5. test_InvalidParameters() - verificar validación de parámetros
-6. test_GasOptimization() - medir gas costs y optimizar si necesario
+2. test_ZeroTradeSize() - manejo de trade size cero
+3. test_OverflowProtection() - verificar protección contra overflow en cálculos
+4. test_Reentrancy() - verificar protección contra reentrancy
+5. test_AccessControl() - verificar que solo owner puede configurar
+6. test_InvalidParameters() - verificar validación de parámetros
 
 Requisitos:
-- Tests en test/unit/ o test/security/
-- Usar fuzzing donde sea apropiado (Foundry fuzz testing)
+- Tests en test/integration/ y test/unit/
+- Usar forge test --fork-url para tests en fork
 - Comentarios explicando cada caso
 - Validar que no hay vulnerabilidades obvias
 
@@ -583,11 +535,11 @@ Ejecutar forge test --gas-report para análisis de gas.
 
 ### Dependencias
 
-- Paso 2.2 (tests de integración)
+- Paso 2.2 (tests de detección de sandwich)
 
 ### Referencias
 
-- `cursor/project-context.md` - Sección "Privacidad y seguridad"
+- `.cursor/project-context.md` - Sección "Privacidad y seguridad"
 
 ---
 
@@ -608,13 +560,13 @@ Crear script de deployment usando Foundry scripts.
 ### ¿Qué pedir a la IA?
 
 ```
-Crea script de deployment para AntiLVRHook usando Foundry.
+Crea script de deployment para AntiSandwichHook usando Foundry.
 
-Script requerido: script/deploy/DeployAntiLVRHook.s.sol
+Script requerido: script/deploy/DeployAntiSandwichHook.s.sol
 
 Funcionalidad:
-1. Deploy AntiLVRHook con parámetros iniciales
-2. Configurar parámetros (baseFee, volatilityMultiplier, etc.)
+1. Deploy AntiSandwichHook con parámetros iniciales
+2. Configurar parámetros (lowRiskFee, mediumRiskFee, highRiskFee, thresholds)
 3. Verificar contrato (opcional, para mainnet)
 4. Guardar addresses en archivo o variables de entorno
 5. Logging de información de deployment
@@ -637,7 +589,7 @@ Referencias:
 
 ### Referencias
 
-- `cursor/project-context.md` - Sección "Flujo de ejecución básico"
+- `.cursor/project-context.md` - Sección "Flujo de ejecución básico"
 
 ---
 
@@ -652,7 +604,7 @@ Deployar el hook a testnet (Sepolia o Base Sepolia) y validar funcionamiento. **
 ### ¿Qué pedir a la IA?
 
 ```
-Guíame para deployar AntiLVRHook a testnet.
+Guíame para deployar AntiSandwichHook a testnet.
 
 Pasos requeridos:
 1. Configurar .env con RPC_URL y PRIVATE_KEY de testnet
@@ -662,6 +614,7 @@ Pasos requeridos:
 5. Ejecutar tests en fork de testnet para validar
 6. Guardar contract address para documentación
 7. **GUARDAR TxIDs de deployment** (requisito del hackathon)
+8. Ejecutar swap de prueba para validar funcionamiento
 
 Validaciones:
 - Contrato deployado correctamente
@@ -692,55 +645,18 @@ Referencias:
 
 ## Paso 4.1: Actualizar README con información completa
 
-**Estado:** ✅ **COMPLETADO** (parcial - falta info de deployment)
-
-### ¿Qué hacer?
-
-Actualizar README.md con información completa del proyecto, instrucciones de uso, y links de deployment.
+**Estado:** ✅ **COMPLETADO** (parcial)
 
 ### Estado Actual
 
 ✅ **Completado parcialmente** - README.md actualizado con:
-- Descripción del problema y solución
+- Descripción del problema y solución (Anti-Sandwich)
 - Instrucciones de instalación y setup
 - Comandos de testing
 - Arquitectura y cómo funciona
-- Información del hackathon
+- Información del hackathon (Track 1)
 
 ⚠️ **Pendiente**: Agregar links a contract addresses en testnet (después del deployment)
-
-### ¿Qué pedir a la IA?
-
-```
-Actualiza README.md con información completa del proyecto.
-
-Contenido requerido:
-1. Descripción clara del problema y solución
-2. Instrucciones de instalación y setup
-3. Comandos de testing y deployment
-4. Links a contract addresses en testnet
-5. Ejemplos de uso
-6. Arquitectura y cómo funciona
-7. Contribuciones y licencia
-
-Requisitos:
-- Todo en inglés (público)
-- Formato markdown profesional
-- Incluir badges si aplica
-- Links a recursos de Uniswap v4
-- Referencias a cursor/project-context.md para contexto técnico interno
-
-NO incluir información privada o sensible.
-```
-
-### Dependencias
-
-- Paso 3.2 (deployment completado)
-
-### Referencias
-
-- `README.md` (actual) - Base para actualizar
-- `cursor/project-context.md` - Información técnica
 
 ---
 
@@ -750,20 +666,23 @@ NO incluir información privada o sensible.
 
 ### ¿Qué hacer?
 
-Crear demo que muestre el hook en acción: swap normal vs swap con hook, comparación de LVR, fee dinámica.
+Crear demo que muestre el hook en acción: swap normal vs swap con hook, comparación de fees, detección de sandwich.
 
 ### ¿Qué pedir a la IA?
 
 ```
-Crea demo funcional para mostrar AntiLVRHook en acción.
+Crea demo funcional para mostrar AntiSandwichHook en acción.
 
 Demo requerido:
 1. Script o guía para ejecutar swaps de prueba
 2. Comparación visual o numérica:
-   - Swap sin hook vs swap con hook
-   - LVR antes vs después
-   - Fee estática vs fee dinámica
-3. Métricas clave para mostrar a jurados
+   - Swap normal vs swap con hook
+   - Fee baja (5 bps) vs fee alta (60 bps) cuando se detecta sandwich
+   - RiskScore calculado para diferentes escenarios
+3. Métricas clave para mostrar a jurados:
+   - Detección de patrones de sandwich
+   - Reducción de MEV estimada
+   - Fee dinámica funcionando
 4. Screenshots o logs de transacciones
 
 Formato:
@@ -784,6 +703,7 @@ Referencias:
 ### Dependencias
 
 - Paso 4.1 (README actualizado)
+- Paso 3.2 (deployment completado)
 
 ### Referencias
 
@@ -802,24 +722,24 @@ Crear guión estructurado para video demo de 3 minutos (inglés con subtítulos)
 ### ¿Qué pedir a la IA?
 
 ```
-Crea guión completo para video pitch de 3 minutos del Hook Anti-LVR.
+Crea guión completo para video pitch de 3 minutos del Hook Anti-Sandwich.
 
 Estructura requerida:
-1. Hook (0-15s) - Problema: LVR afecta a LPs
-2. Solución (15-60s) - Cómo funciona: precio amortiguado + fee dinámica
+1. Hook (0-15s) - Problema: Sandwich attacks en stable assets
+2. Solución (15-60s) - Cómo funciona: riskScore + fee dinámica
 3. Demo (60-150s) - Mostrar hook en acción, métricas, comparación
-4. Cierre (150-180s) - Por qué es ganador, sin oráculos, elegante
+4. Cierre (150-180s) - Por qué es ganador, sin oráculos, elegante, Track 1
 
 Requisitos:
 - Máximo 3 minutos (requisito del hackathon)
 - Inglés con subtítulos
 - Puntos clave de docs-internos/idea-general.md
-- Enfoque en: sin oráculos, simple, efectivo
+- Enfoque en: sin oráculos, simple, efectivo, alineado con Track 1
 - Mostrar TxIDs y contract address en explorer
 - Preparado para grabación
 
 Referencias:
-- docs-internos/idea-general.md - Sección "Resumen en frase (para tu pitch)"
+- docs-internos/idea-general.md - Sección "Resumen en frase para tu pitch"
 - cursor/project-context.md - Sección "Requisitos del Hackathon"
 - docs-internos/hackathon-ethglobal-uniswap.md - Requisitos de video
 ```
@@ -830,14 +750,8 @@ Referencias:
 
 ### Referencias
 
-- `docs-internos/idea-general.md` - Sección "Resumen en frase (para tu pitch)"
+- `docs-internos/idea-general.md` - Sección "Resumen en frase para tu pitch"
 - `docs-internos/hackathon-ethglobal-uniswap.md` - Requisitos de video
-
----
-
-# FASE 4.4: Preparar Entregables del Hackathon
-
-**Objetivo:** Asegurar que todos los requisitos del hackathon estén completos antes de la entrega.
 
 ---
 
@@ -852,7 +766,7 @@ Verificar y preparar todos los entregables obligatorios del hackathon.
 ### ¿Qué pedir a la IA?
 
 ```
-Crea checklist completo de entregables para ETHGlobal Buenos Aires - Track 2.
+Crea checklist completo de entregables para ETHGlobal Buenos Aires - Track 1.
 
 Verificar que tenemos:
 1. ✅ TxIDs de transacciones (testnet/mainnet) - Guardados en archivo o README
@@ -866,6 +780,7 @@ Crear archivo HACKATHON_SUBMISSION.md con:
 - Contract addresses deployados
 - Link al video demo
 - Resumen ejecutivo del proyecto
+- Alineación con Track 1 (Stable-Asset Hooks)
 
 Referencias:
 - cursor/project-context.md - Sección "Requisitos del Hackathon"
@@ -881,7 +796,7 @@ Referencias:
 
 ### Referencias
 
-- `cursor/project-context.md` - Sección "Requisitos del Hackathon"
+- `.cursor/project-context.md` - Sección "Requisitos del Hackathon"
 - `docs-internos/hackathon-ethglobal-uniswap.md` - Requisitos de calificación
 
 ---
@@ -903,12 +818,12 @@ Analizar y optimizar gas costs del hook.
 ### ¿Qué pedir a la IA?
 
 ```
-Optimiza gas costs de AntiLVRHook.
+Optimiza gas costs de AntiSandwichHook.
 
 Análisis requerido:
 1. Ejecutar forge test --gas-report
 2. Identificar funciones con mayor gas cost
-3. Optimizar storage (pack structs, usar uint128 donde sea posible)
+3. Optimizar storage (pack structs, usar uint8/uint160 donde sea posible)
 4. Optimizar cálculos (evitar divisiones, usar bit shifts)
 5. Reducir SLOADs (caching de variables)
 
@@ -928,7 +843,7 @@ Referencias:
 
 ### Referencias
 
-- `cursor/project-context.md` - Sección "Notas para escalabilidad futura"
+- `.cursor/project-context.md` - Sección "Notas para escalabilidad futura"
 
 ---
 
@@ -943,10 +858,10 @@ Implementar mejoras opcionales mencionadas en project-context.md.
 ### ¿Qué pedir a la IA?
 
 ```
-Implementa mejoras opcionales para AntiLVRHook (si hay tiempo antes del hackathon).
+Implementa mejoras opcionales para AntiSandwichHook (si hay tiempo antes del hackathon).
 
 Mejoras posibles (elegir según tiempo disponible):
-1. Métricas de volatilidad más sofisticadas (EWMA)
+1. Métricas más sofisticadas (EWMA para avgTradeSize)
 2. Events más detallados para analytics
 3. Funciones view para consultar métricas históricas
 4. Mejoras en configuración (timelock, multi-sig)
@@ -958,7 +873,7 @@ Requisitos:
 - Priorizar según impacto vs tiempo
 
 Referencias:
-- cursor/project-context.md - Sección "Posibles mejoras (sin predefinir fases)"
+- cursor/project-context.md - Sección "Notas para escalabilidad futura"
 ```
 
 ### Dependencias
@@ -967,7 +882,7 @@ Referencias:
 
 ### Referencias
 
-- `cursor/project-context.md` - Sección "Notas para escalabilidad futura"
+- `.cursor/project-context.md` - Sección "Notas para escalabilidad futura"
 
 ---
 
@@ -977,15 +892,15 @@ Referencias:
 |------|------|--------|--------|-------|
 | 0 | 0.1 | Estructura base de carpetas | ✅ | ✅ Completado - Template oficial ya tiene estructura |
 | 0 | 0.2 | Configurar Foundry | ✅ | ✅ Completado - foundry.toml configurado, dependencias instaladas |
-| 1 | 1.1 | Interfaces y base del hook | ⚪ | 🎯 **PRÓXIMO PASO** - Crear AntiLVRHook.sol |
-| 1 | 1.2 | Cálculo de precio amortiguado | ⚪ | Requiere Paso 1.1 |
+| 1 | 1.1 | Interfaces y base del hook | ⚪ | 🎯 **PRÓXIMO PASO** - Crear AntiSandwichHook.sol |
+| 1 | 1.2 | Cálculo de riskScore | ⚪ | Requiere Paso 1.1 |
 | 1 | 1.3 | Cálculo de fee dinámica | ⚪ | Requiere Paso 1.2 |
 | 1 | 1.4 | Implementar beforeSwap | ⚪ | Requiere Pasos 1.2 y 1.3 |
 | 1 | 1.5 | Implementar afterSwap | ⚪ | Requiere Paso 1.4 |
 | 1 | 1.6 | Funciones de configuración | ⚪ | Requiere Paso 1.5 |
 | 2 | 2.1 | Setup de testing | ⚪ | Requiere Paso 1.6 |
-| 2 | 2.2 | Tests de integración | ⚪ | Requiere Paso 2.1 |
-| 2 | 2.3 | Tests de edge cases | ⚪ | Requiere Paso 2.2 |
+| 2 | 2.2 | Tests de detección de sandwich | ⚪ | Requiere Paso 2.1 - **CRÍTICO** |
+| 2 | 2.3 | Tests de integración y edge cases | ⚪ | Requiere Paso 2.2 |
 | 3 | 3.1 | Script de deployment | ⚪ | Requiere Paso 2.3 |
 | 3 | 3.2 | Deployment a testnet | ⚪ | Requiere Paso 3.1 - **CRÍTICO: Guardar TxIDs** |
 | 4 | 4.1 | Actualizar README | ✅ | ✅ Completado parcialmente - Falta info de deployment |
@@ -1003,47 +918,10 @@ Referencias:
 - **Valida cada fase** antes de continuar a la siguiente
 - **Consulta referencias** cuando tengas dudas
 - **Mantén simplicidad** - MVP funcional es la prioridad
-
----
-
----
-
-## 🎯 Estado Actual del Proyecto
-
-### ✅ Completado
-
-1. **Fase 0.1** - Estructura base de carpetas
-   - Template oficial de Uniswap v4 ya incluye estructura completa
-   - Carpetas: `src/`, `test/`, `script/`, `lib/`
-
-2. **Fase 0.2** - Configuración Foundry
-   - `foundry.toml` configurado (Solidity 0.8.30, EVM Cancun)
-   - Dependencias instaladas (Uniswap v4, hookmate, forge-std)
-   - `.env.example` creado
-   - `.cursor/` con project-context.md y user-rules.md
-
-3. **Fase 4.1** - README actualizado (parcial)
-   - README.md con documentación completa del MVP
-   - Falta: links a contract addresses (después del deployment)
-
-### 🎯 Próximo Paso
-
-**Fase 1, Paso 1.1** - Crear interfaces y base del hook
-- Crear `src/AntiLVRHook.sol`
-- Basarse en `Counter.sol` del template
-- Implementar estructura base con storage mínimo
-- Configurar `getHookPermissions()` para beforeSwap y afterSwap
-
-### 📋 Pendiente
-
-- **Fase 1** (Pasos 1.1-1.6): Implementación completa del hook
-- **Fase 2** (Pasos 2.1-2.3): Testing completo
-- **Fase 3** (Pasos 3.1-3.2): Deployment a testnet
-- **Fase 4** (Pasos 4.2-4.4): Demo, video pitch y entregables
+- **Enfócate en Track 1** - Stable assets, detección de sandwich, fee dinámica
 
 ---
 
 📅 **Última actualización:** 2025-11-22  
 👤 **Creado por:** kaream  
-🎯 **Versión:** 1.1
-
+🎯 **Versión:** 2.0 (Track 1 - Stable Assets - Anti-Sandwich Hook)
