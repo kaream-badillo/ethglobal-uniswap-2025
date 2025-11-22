@@ -39,7 +39,7 @@ Este documento contiene pasos específicos con prompts listos para copiar/pegar 
 
 ## 📍 Estado Actual del Proyecto (Resumen Ejecutivo)
 
-### ✅ Completado (3/21 pasos)
+### ✅ Completado (4/21 pasos)
 
 1. **Fase 0.1** - Estructura base de carpetas ✅
    - Template oficial de Uniswap v4 ya incluye estructura completa
@@ -55,13 +55,19 @@ Este documento contiene pasos específicos con prompts listos para copiar/pegar 
    - README.md actualizado con nueva idea Anti-Sandwich
    - ⚠️ Pendiente: agregar links a contract addresses (después del deployment)
 
+4. **Fase 1.1** - Estructura base del hook ✅
+   - `AntiSandwichHook.sol` creado con estructura completa
+   - Storage structure `PoolStorage` con todos los campos necesarios
+   - Constantes para pesos del riskScore definidas
+   - `getHookPermissions()` configurado
+   - Events y placeholders implementados
+
 ### 🎯 Próximo Paso Crítico
 
-**Fase 1, Paso 1.1** - Crear interfaces y base del hook ⚪
-- **Acción:** Renombrar/crear `src/AntiSandwichHook.sol`
-- **Basarse en:** `Counter.sol` del template como referencia
-- **Implementar:** Estructura base con nuevo storage (lastPrice, lastTradeSize, avgTradeSize, recentSpikeCount)
-- **Configurar:** `getHookPermissions()` para beforeSwap y afterSwap
+**Fase 1, Paso 1.2** - Implementar cálculo de riskScore ⚪
+- **Acción:** Implementar función `_calculateRiskScore()` en `AntiSandwichHook.sol`
+- **Lógica:** riskScore = (W1 * relativeSize) + (W2 * deltaPrice) + (W3 * recentSpikeCount)
+- **Manejar:** Edge cases (primera vez, avgTradeSize = 0, overflow protection)
 
 ### 📋 Pendiente (18 pasos)
 
@@ -125,11 +131,27 @@ Este documento contiene pasos específicos con prompts listos para copiar/pegar 
 
 ## Paso 1.1: Crear interfaces y base del hook
 
-**Estado:** ⚪ **PRÓXIMO PASO** 🎯
+**Estado:** ✅ **COMPLETADO**
 
 ### ¿Qué hacer?
 
 Crear las interfaces necesarias de Uniswap v4 y la estructura base del contrato `AntiSandwichHook.sol` con storage mínimo para detección de sandwich.
+
+### Estado Actual
+
+✅ **Completado** - `AntiSandwichHook.sol` creado con:
+- Estructura base heredando de `BaseHook` (OpenZeppelin)
+- Storage structure `PoolStorage` con todos los campos necesarios:
+  - lastPrice (uint160), lastTradeSize (uint256), avgTradeSize (uint256)
+  - recentSpikeCount (uint8)
+  - lowRiskFee, mediumRiskFee, highRiskFee (uint24)
+  - riskThresholdLow, riskThresholdHigh (uint8)
+- Constantes para pesos del riskScore (W1=50, W2=30, W3=20)
+- `getHookPermissions()` configurado solo para beforeSwap y afterSwap
+- Placeholders para hooks y funciones helper (marcados con TODO)
+- Events definidos (PoolConfigUpdated, DynamicFeeApplied, MetricsUpdated)
+- Funciones de configuración placeholder (setPoolConfig, getPoolConfig, getPoolMetrics)
+- Comentarios NatSpec completos
 
 ### ¿Qué pedir a la IA?
 
@@ -892,7 +914,7 @@ Referencias:
 |------|------|--------|--------|-------|
 | 0 | 0.1 | Estructura base de carpetas | ✅ | ✅ Completado - Template oficial ya tiene estructura |
 | 0 | 0.2 | Configurar Foundry | ✅ | ✅ Completado - foundry.toml configurado, dependencias instaladas |
-| 1 | 1.1 | Interfaces y base del hook | ⚪ | 🎯 **PRÓXIMO PASO** - Crear AntiSandwichHook.sol |
+| 1 | 1.1 | Interfaces y base del hook | ✅ | ✅ Completado - AntiSandwichHook.sol creado con estructura completa |
 | 1 | 1.2 | Cálculo de riskScore | ⚪ | Requiere Paso 1.1 |
 | 1 | 1.3 | Cálculo de fee dinámica | ⚪ | Requiere Paso 1.2 |
 | 1 | 1.4 | Implementar beforeSwap | ⚪ | Requiere Pasos 1.2 y 1.3 |
