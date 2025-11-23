@@ -1,4 +1,4 @@
-# 🪝 Tick Impact Predictor Hook - Quadratic Fee Adjustment Based on Pre-Swap deltaTick Prediction
+# 🪝 AntiSandwich Hook
 
 > **This hook NEVER blocks swaps — it only adjusts fees.**
 
@@ -6,7 +6,7 @@ A Uniswap v4 Hook that predicts price impact using `deltaTick` before swap execu
 
 **Built for ETHGlobal Buenos Aires 2025 - Track 1: Stable-Asset Hooks**
 
-> 💡 **MVP Name:** Tick Impact Predictor Hook  
+> 💡 **MVP Name:** AntiSandwich Hook  
 > **Technical Implementation:** AntiSandwichHook (contract name)
 
 > 📖 **For detailed technical documentation, see [Technical Architecture](docs/TECHNICAL-ARCHITECTURE.md)** - Complete technical documentation explaining the mathematics, design decisions, and implementation details.
@@ -28,7 +28,7 @@ Users and Liquidity Providers (LPs) in stable asset markets suffer from **Sandwi
 
 ## 💡 Solution
 
-**Tick Impact Predictor Hook** predicts price impact before swap execution and adjusts fees dynamically:
+**AntiSandwich Hook** predicts price impact before swap execution and adjusts fees dynamically:
 
 1. **Predicts price impact** using `deltaTick` - the difference between current and last tick (pre-swap prediction)
 2. **Applies dynamic fees** using a continuous quadratic formula: `fee = baseFee + k1*deltaTick + k2*deltaTick²`
@@ -135,7 +135,7 @@ For instructions on running the functional demo, see:
 
 ```bash
 # Clone the repository
-git clone <YOUR_REPO_URL>
+git clone https://github.com/kaream-badillo/ethglobal-uniswap-template-nov-2025.git
 cd ethglobal-uniswap-template-nov-2025
 
 # Install dependencies
@@ -354,7 +354,7 @@ forge test --fork-url $RPC_URL
 
 | Contract | Address | Explorer | Status |
 |----------|---------|----------|--------|
-| **Tick Impact Predictor Hook**<br/>(AntiSandwichHook) | `0x5AebB929DA77cCDFE141CeB2Af210FaA3905c0c0` | [View on Etherscan](https://sepolia.etherscan.io/address/0x5AebB929DA77cCDFE141CeB2Af210FaA3905c0c0) | ✅ Verified |
+| **AntiSandwich Hook**<br/>(AntiSandwichHook) | `0x5AebB929DA77cCDFE141CeB2Af210FaA3905c0c0` | [View on Etherscan](https://sepolia.etherscan.io/address/0x5AebB929DA77cCDFE141CeB2Af210FaA3905c0c0) | ✅ Verified |
 | **PoolManager** | `0xE03A1074c86CFeDd5C142C4F04F1a1536e203543` | [View on Etherscan](https://sepolia.etherscan.io/address/0xE03A1074c86CFeDd5C142C4F04F1a1536e203543) | - |
 
 **Deployment Transaction:**
