@@ -24,3 +24,4 @@ else
     echo "  2. O trabajar con lo que tienes si los errores no son críticos"
 fi
 
+

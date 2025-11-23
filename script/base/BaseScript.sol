@@ -51,9 +51,16 @@ contract BaseScript is Script, Deployers {
 
     function _etch(address target, bytes memory bytecode) internal override {
         if (block.chainid == 31337) {
-            vm.rpc("anvil_setCode", string.concat('["', vm.toString(target), '",', '"', vm.toString(bytecode), '"]'));
+            // For local simulation, use vm.etch directly
+            // This works in both simulation mode and with anvil
+            vm.etch(target, bytecode);
         } else {
-            revert("Unsupported etch on this network");
+            // For non-local networks, check if code already exists
+            // If not, the deployment will fail (artifacts should be deployed)
+            if (target.code.length == 0) {
+                revert("Unsupported etch on this network - artifacts must be pre-deployed");
+            }
+            // Code already exists, no need to etch
         }
     }
 
